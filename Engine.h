@@ -1,17 +1,15 @@
 #pragma once
-#include "SFML\Graphics.hpp"
-#include "SFML\System.hpp"
-#include "SFML\Window.hpp"
+#include "Title.h"
 
 enum GameState {
-	Startup,
-	Title,
-	Overworld,
-	CombatStart,
-	Combat,
-	CombatEnd,
-	Menu,
-	GameOver
+	_Startup,
+	_Title,
+	_Overworld,
+	_CombatStart,
+	_Combat,
+	_CombatEnd,
+	_Menu,
+	_GameOver
 };
 
 class Engine {
@@ -93,16 +91,22 @@ private:
 	/*\brief Loads flag files from ..\Flags\ folder and stores data in std::vector<Flag*>*/
 	void loadFlags();
 
+//Link assets to graphical components
+	void createTitle();
+
 //Window
 	sf::RenderWindow* window;
 
 //Members
-	GameState currentState = Startup;
+	GameState currentState = _Startup;
 	double totalFiles = 0;
 	double filesLoaded = 0;
 	//std::vector<Animation> animations;
 
 //Environments
+	//Title
+	Title* title;
+
 	//Map environment variables
 	//Map* currentMap;
 	unsigned currentMapID;
@@ -120,6 +124,7 @@ private:
 //Graphics components
 	//Fonts
 	sf::Font ArcadeClassic;
+	sf::Font Arrows;
 	sf::Font Cambria;
 	sf::Font JMH_Arkham;
 	sf::Font Lady_Radical_2;
@@ -131,13 +136,6 @@ private:
 	
 	sf::RectangleShape loadingBarBorder;
 	sf::RectangleShape loadingBarFill;
-
-	//Title
-	sf::Text gameTitle;
-	sf::Text newGame;
-	sf::Text loadGame;
-	
-	sf::Sprite background;
 
 	//Combat
 	sf::Text creatureOneName;

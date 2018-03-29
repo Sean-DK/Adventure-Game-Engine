@@ -102,6 +102,13 @@ void Engine::startup() {
 	tempPercent = double(filesLoaded / totalFiles) * 100;
 	percentComplete.setString(std::to_string(tempPercent) + "%");
 	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
+	draw();
+
+	createTitle();
+
+	sf::Clock tempClock;
+	while (tempClock.getElapsedTime().asMilliseconds() < 700) {}
+	changeState(_Title);
 }
 
 void Engine::countFiles() {
@@ -205,28 +212,28 @@ void Engine::countFiles() {
 void Engine::draw() {
 	window->clear();
 	switch (currentState) {
-	case Startup:
+	case _Startup:
 		drawStartup();
 		break;
-	case Title:
+	case _Title:
 		drawTitle();
 		break;
-	case Overworld:
+	case _Overworld:
 		drawOverworld();
 		break;
-	case CombatStart:
+	case _CombatStart:
 		drawCombatStart();
 		break;
-	case Combat:
+	case _Combat:
 		drawCombat();
 		break;
-	case CombatEnd:
+	case _CombatEnd:
 		drawCombatEnd();
 		break;
-	case Menu:
+	case _Menu:
 		drawMenu();
 		break;
-	case GameOver:
+	case _GameOver:
 		drawGameOver();
 		break;
 	}
@@ -259,8 +266,13 @@ void Engine::drawStartup() {
 	
 }
 
-void Engine::drawTitle()
-{
+void Engine::drawTitle() {
+	std::vector<sf::Text*> text;
+	text = title->getDrawableText();
+	std::vector<sf::Sprite*> sprite;
+	sprite = title->getDrawableSprite();
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
+	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
 }
 
 void Engine::drawOverworld()
@@ -287,12 +299,23 @@ void Engine::drawGameOver()
 {
 }
 
-void Engine::startupHandler(sf::Event event)
-{
+void Engine::startupHandler(sf::Event event) {
+	//ignore input on the startup screen
 }
 
-void Engine::titleHandler(sf::Event event)
-{
+void Engine::titleHandler(sf::Event event) {
+	switch (title->handleEvent(event)) {
+	case 0:
+		//TODO: new game
+		changeState(_Overworld);
+		break;
+	case 1:
+		//TODO: load game
+		break;
+	default:
+		//ignore
+		break;
+	}
 }
 
 void Engine::overworldHandler(sf::Event event)
@@ -326,28 +349,28 @@ Engine::Engine(sf::RenderWindow* window)
 
 void Engine::handleEvent(sf::Event event) {
 	switch (currentState) {
-	case Startup:
+	case _Startup:
 		startupHandler(event);
 		break;
-	case Title:
+	case _Title:
 		titleHandler(event);
 		break;
-	case Overworld:
+	case _Overworld:
 		overworldHandler(event);
 		break;
-	case CombatStart:
+	case _CombatStart:
 		combatStartHandler(event);
 		break;
-	case Combat:
+	case _Combat:
 		combatHandler(event);
 		break;
-	case CombatEnd:
+	case _CombatEnd:
 		combatEndHandler(event);
 		break;
-	case Menu:
+	case _Menu:
 		menuHandler(event);
 		break;
-	case GameOver:
+	case _GameOver:
 		gameOverHandler(event);
 		break;
 	}
@@ -360,11 +383,12 @@ void Engine::updateGame(sf::Time elapsed) {
 
 void Engine::loadFonts() {
 	ArcadeClassic.loadFromFile("Fonts\\ARCADECLASSIC.ttf");
+	Arrows.loadFromFile("Fonts\\Arrows.ttf");
 	Cambria.loadFromFile("Fonts\\cambria.ttf");
 	JMH_Arkham.loadFromFile("Fonts\\JMH Arkham.ttf");
 	Lady_Radical_2.loadFromFile("Fonts\\Lady Radical 2.ttf");
 	PixelFJ_Verdana.loadFromFile("Fonts\\PixelFJVerdana12pt.ttf");
-	filesLoaded += 5;
+	filesLoaded += 6;
 }
 
 void Engine::loadMetadata() {
@@ -387,6 +411,7 @@ void Engine::loadMetadata() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Metadata\\" + files[i]);
+		//TODO: read the file into a data structure
 	}
 	filesLoaded += files.size();
 }
@@ -409,8 +434,9 @@ void Engine::loadTextures() {
 		closedir(dir);
 	}
 	for (unsigned i = 0; i < files.size(); i++) {
-		std::ifstream file;
-		file.open("Textures\\" + files[i]);
+		sf::Texture* texture = new sf::Texture();
+		texture->loadFromFile("Textures\\" + files[i]);
+		textures.push_back(texture);
 	}
 	filesLoaded += files.size();
 }
@@ -435,6 +461,7 @@ void Engine::loadMaps() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Maps\\" + files[i]);
+		//TODO: read the file into a data structure
 	}
 	filesLoaded += files.size();
 }
@@ -459,6 +486,7 @@ void Engine::loadCreatures() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Creatures\\" + files[i]);
+		//TODO: read the file into a data structure
 	}
 	filesLoaded += files.size();
 }
@@ -483,6 +511,7 @@ void Engine::loadItems() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Items\\" + files[i]);
+		//TODO: read the file into a data structure
 	}
 	filesLoaded += files.size();
 }
@@ -507,6 +536,11 @@ void Engine::loadFlags() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Flags\\" + files[i]);
+		//TODO: read the file into a data structure
 	}
 	filesLoaded += files.size();
+}
+
+void Engine::createTitle() {
+	title = new Title(Lady_Radical_2, PixelFJ_Verdana, Arrows, textures[0]);
 }
