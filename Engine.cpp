@@ -1,7 +1,10 @@
 #include "stdafx.h"
-#include "Engine.h"
-#include "Dirent.h"
+#include "Engine.hpp"
+#include "Dirent.hpp"
+#include "json.hpp"
 #include <fstream>
+
+using json = nlohmann::json;
 
 void Engine::startup() {
 	/*Pre-startup consists of loading the fonts necessary for the
@@ -43,9 +46,11 @@ void Engine::startup() {
 	percentComplete.setString("0%");
 	loadingBarFill.setSize(sf::Vector2f(1, 50));
 	draw();
+
 	loadMetadata();
 	
-	/*Load textures*/
+	/*Load textures, textures must be loaded before maps, items, and creatures because
+	textures are used in each of those*/
 	contentName.setString("Loading textures - ");
 	tempPos = contentName.getGlobalBounds().left + contentName.getGlobalBounds().width;
 	percentComplete.setPosition(sf::Vector2f(tempPos, 210));
@@ -53,7 +58,20 @@ void Engine::startup() {
 	percentComplete.setString(std::to_string(tempPercent) + "%");
 	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
 	draw();
+
 	loadTextures();
+
+	/*Load flags, flags must be loaded before maps, items, and creatues because the loading
+	process of each of those requires access to flags*/
+	contentName.setString("Loading flags - ");
+	tempPos = contentName.getGlobalBounds().left + contentName.getGlobalBounds().width;
+	percentComplete.setPosition(sf::Vector2f(tempPos, 210));
+	tempPercent = double(filesLoaded / totalFiles) * 100;
+	percentComplete.setString(std::to_string(tempPercent) + "%");
+	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
+	draw();
+
+	loadFlags();
 
 	/*Load maps*/
 	contentName.setString("Loading maps - ");
@@ -63,6 +81,7 @@ void Engine::startup() {
 	percentComplete.setString(std::to_string(tempPercent) + "%");
 	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
 	draw();
+	
 	loadMaps();
 
 	/*Load creatures*/
@@ -73,6 +92,7 @@ void Engine::startup() {
 	percentComplete.setString(std::to_string(tempPercent) + "%");
 	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
 	draw();
+	
 	loadCreatures();
 
 	/*Load items*/
@@ -83,17 +103,8 @@ void Engine::startup() {
 	percentComplete.setString(std::to_string(tempPercent) + "%");
 	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
 	draw();
+	
 	loadItems();
-
-	/*Load flags*/
-	contentName.setString("Loading flags - ");
-	tempPos = contentName.getGlobalBounds().left + contentName.getGlobalBounds().width;
-	percentComplete.setPosition(sf::Vector2f(tempPos, 210));
-	tempPercent = double(filesLoaded / totalFiles) * 100;
-	percentComplete.setString(std::to_string(tempPercent) + "%");
-	loadingBarFill.setSize(sf::Vector2f(tempPercent * 4, 50));
-	draw();
-	loadFlags();
 
 	/*Cleanup display*/
 	contentName.setString("Finishing up - ");
@@ -105,9 +116,11 @@ void Engine::startup() {
 	draw();
 
 	createTitle();
+	createParty();
+	createMenu();
 
 	sf::Clock tempClock;
-	while (tempClock.getElapsedTime().asMilliseconds() < 700) {}
+	while (tempClock.getElapsedTime().asMilliseconds() < 300) {}
 	changeState(_Title);
 }
 
@@ -236,23 +249,36 @@ void Engine::draw() {
 	case _GameOver:
 		drawGameOver();
 		break;
+	case _Quit:
+		drawQuit();
+		break;
 	}
+	if (!animations.empty()) drawAnimation();
 	window->display();
 }
 
-void Engine::updateAnimations(sf::Time elapsed)
-{
+void Engine::updateAnimations(sf::Time elapsed) {
+	if (!animations.empty())
+		if (animations[0].play(elapsed)) 
+			animations.erase(animations.begin());
 }
 
 void Engine::combatStart() {
-	//startAnimation(Animation(combatTransitionStart));
-	//changeGameState(_CombatStart);
-	//startAnimation(Animation(combatTransitionEnd));
+	std::vector<Creature> enemies;
+	creatures.push_back(creatures[0]);
+	combatEnvironment = new Combat(party, enemies, this, JMH_Arkham, Arrows, ArcadeClassic);
+	startAnimation(Animation(CombatStart, this));
+	
 }
 
-//void Engine::startAnimation(Animation animation) {
+void Engine::startAnimation(Animation animation) {
+	animations.push_back(animation);
+}
 
-//}
+void Engine::changeCurrentMap(unsigned id) {
+	currentMap = maps[id];
+	currentMapID = id;
+}
 
 void Engine::changeState(GameState state) {
 	currentState = state;
@@ -275,28 +301,61 @@ void Engine::drawTitle() {
 	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
 }
 
-void Engine::drawOverworld()
-{
+void Engine::drawOverworld() {
+	std::vector<sf::Sprite*> sprite;
+	sprite = currentMap->getDrawableSprite();
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
 }
 
-void Engine::drawCombatStart()
-{
+void Engine::drawCombatStart() {
+	std::vector<sf::Sprite*> sprite;
+	sprite = currentMap->getDrawableSprite();
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
 }
 
-void Engine::drawCombat()
-{
+void Engine::drawCombat() {
+	std::vector<sf::RectangleShape*> shape;
+	shape = combatEnvironment->getDrawableShape();
+	std::vector<sf::Text*> text;
+	text = combatEnvironment->getDrawableText();
+	std::vector<sf::Sprite*> sprite;
+	sprite = combatEnvironment->getDrawableSprite();
+	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
+	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
 }
 
-void Engine::drawCombatEnd()
-{
+void Engine::drawCombatEnd() {
+
 }
 
-void Engine::drawMenu()
-{
+void Engine::drawMenu() {
+	std::vector<sf::RectangleShape*> shape;
+	shape = menu->getDrawableShape();
+	std::vector<sf::Text*> text;
+	text = menu->getDrawableText();
+	std::vector<sf::Sprite*> sprite;
+	sprite = menu->getDrawableSprite();
+	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
+	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
 }
 
-void Engine::drawGameOver()
-{
+void Engine::drawGameOver() {
+
+}
+
+void Engine::drawQuit() {
+	window->close();
+}
+
+void Engine::drawAnimation() {
+	switch (animations[0].getType()) {
+	case TitleFadeNew:
+	case ChangeMap:
+	case CombatStart:
+		window->draw(animations[0].getShape());
+	}
 }
 
 void Engine::startupHandler(sf::Event event) {
@@ -306,8 +365,7 @@ void Engine::startupHandler(sf::Event event) {
 void Engine::titleHandler(sf::Event event) {
 	switch (title->handleEvent(event)) {
 	case 0:
-		//TODO: new game
-		changeState(_Overworld);
+		startAnimation(Animation(TitleFadeNew, this));
 		break;
 	case 1:
 		//TODO: load game
@@ -318,8 +376,19 @@ void Engine::titleHandler(sf::Event event) {
 	}
 }
 
-void Engine::overworldHandler(sf::Event event)
-{
+void Engine::overworldHandler(sf::Event event) {
+	switch (currentMap->handleEvent(event)) {
+	case _Overworld:
+		//ignore
+		break;
+	case _CombatStart:
+		changeState(_CombatStart);
+		combatStart();
+		break;
+	case _Menu:
+		changeState(_Menu);
+		break;
+	}
 }
 
 void Engine::combatStartHandler(sf::Event event)
@@ -334,12 +403,22 @@ void Engine::combatEndHandler(sf::Event event)
 {
 }
 
-void Engine::menuHandler(sf::Event event)
-{
+void Engine::menuHandler(sf::Event event) {
+	switch (menu->handleEvent(event)) {
+	case _Overworld:
+		changeState(_Overworld);
+		break;
+	case _Quit:
+		changeState(_Quit);
+		break;
+	case _Menu:
+		//ignore
+		break;
+	}
 }
 
-void Engine::gameOverHandler(sf::Event event)
-{
+void Engine::gameOverHandler(sf::Event event) {
+
 }
 
 Engine::Engine(sf::RenderWindow* window) 
@@ -348,31 +427,36 @@ Engine::Engine(sf::RenderWindow* window)
 }
 
 void Engine::handleEvent(sf::Event event) {
-	switch (currentState) {
-	case _Startup:
-		startupHandler(event);
-		break;
-	case _Title:
-		titleHandler(event);
-		break;
-	case _Overworld:
-		overworldHandler(event);
-		break;
-	case _CombatStart:
-		combatStartHandler(event);
-		break;
-	case _Combat:
-		combatHandler(event);
-		break;
-	case _CombatEnd:
-		combatEndHandler(event);
-		break;
-	case _Menu:
-		menuHandler(event);
-		break;
-	case _GameOver:
-		gameOverHandler(event);
-		break;
+	if (!animations.empty()) { 
+		//ignore input duration animation
+	}
+	else {
+		switch (currentState) {
+		case _Startup:
+			startupHandler(event);
+			break;
+		case _Title:
+			titleHandler(event);
+			break;
+		case _Overworld:
+			overworldHandler(event);
+			break;
+		case _CombatStart:
+			combatStartHandler(event);
+			break;
+		case _Combat:
+			combatHandler(event);
+			break;
+		case _CombatEnd:
+			combatEndHandler(event);
+			break;
+		case _Menu:
+			menuHandler(event);
+			break;
+		case _GameOver:
+			gameOverHandler(event);
+			break;
+		}
 	}
 }
 
@@ -411,7 +495,11 @@ void Engine::loadMetadata() {
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
 		file.open("Metadata\\" + files[i]);
-		//TODO: read the file into a data structure
+		json j;
+		file >> j;
+		metadata = new Metadata();
+		metadata->gameTitle = j.at("Name").get<std::string>();
+		file.close();
 	}
 	filesLoaded += files.size();
 }
@@ -459,10 +547,10 @@ void Engine::loadMaps() {
 		closedir(dir);
 	}
 	for (unsigned i = 0; i < files.size(); i++) {
-		std::ifstream file;
-		file.open("Maps\\" + files[i]);
-		//TODO: read the file into a data structure
+		std::string path = "Maps\\" + files[i];
+		maps.push_back(new Map(path, textures[1], flags, this));
 	}
+	currentMap = maps[0];
 	filesLoaded += files.size();
 }
 
@@ -484,9 +572,24 @@ void Engine::loadCreatures() {
 		closedir(dir);
 	}
 	for (unsigned i = 0; i < files.size(); i++) {
-		std::ifstream file;
-		file.open("Creatures\\" + files[i]);
-		//TODO: read the file into a data structure
+		std::ifstream inFile;
+		std::string path = "Creatures\\" + files[i];
+		inFile.open(path);
+		json j;
+		inFile >> j;
+		int amount = j.at("Amount").get<int>();
+		for (unsigned k = 0; k < amount; k++) {
+			std::string creatureNumber = std::to_string(k);
+			creatures.push_back(new Creature(j.at(creatureNumber).at("Name").get<std::string>(),
+				j.at(creatureNumber).at("Level").get<unsigned>(),
+				j.at(creatureNumber).at("Hitpoints").get<unsigned>(),
+				j.at(creatureNumber).at("Strength").get<unsigned>(),
+				j.at(creatureNumber).at("EXP").get<unsigned>(),
+				j.at(creatureNumber).at("Biome").get<std::string>(),
+				j.at(creatureNumber).at("hasFlag").get<bool>(),
+				flags[j.at(creatureNumber).at("Flag").get<int>()]));
+		}
+		inFile.close();
 	}
 	filesLoaded += files.size();
 }
@@ -509,9 +612,7 @@ void Engine::loadItems() {
 		closedir(dir);
 	}
 	for (unsigned i = 0; i < files.size(); i++) {
-		std::ifstream file;
-		file.open("Items\\" + files[i]);
-		//TODO: read the file into a data structure
+		//TODO:
 	}
 	filesLoaded += files.size();
 }
@@ -535,12 +636,40 @@ void Engine::loadFlags() {
 	}
 	for (unsigned i = 0; i < files.size(); i++) {
 		std::ifstream file;
-		file.open("Flags\\" + files[i]);
-		//TODO: read the file into a data structure
+		std::string path = "Flags\\" + files[i];
+		file.open(path);
+		if (file.is_open()) {
+			json j;
+			file >> j;
+			unsigned amount = j.at("Amount").get<unsigned>();
+			flags.reserve(amount);
+			for (unsigned k = 0; k < amount; k++) {
+				if (k == 0) {
+					flags.push_back(new Flag());
+				}
+				else {
+					std::string flagNumber = std::to_string(k);
+					unsigned req = j.at(flagNumber).at("Req").get<unsigned>();
+					flags.push_back(new Flag(flags[req]));
+				}
+			}
+		}
 	}
 	filesLoaded += files.size();
 }
 
 void Engine::createTitle() {
 	title = new Title(Lady_Radical_2, PixelFJ_Verdana, Arrows, textures[0]);
+	title->setTitle(metadata->gameTitle);
+}
+
+void Engine::createMenu() {
+	menu = new Menu(JMH_Arkham, Arrows, party);
+}
+
+void Engine::createParty() {
+	party.push_back(new PlayerCharacter("Respa", textures[1], 1));
+	party.push_back(new PlayerCharacter("Pieron", textures[1], 2));
+	party.push_back(new PlayerCharacter("Miles", textures[1], 3));
+	party.push_back(new PlayerCharacter("Luna", textures[1], 4));
 }

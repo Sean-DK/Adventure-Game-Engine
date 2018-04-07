@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Title.h"
+#include "Title.hpp"
 
 Title::Title(sf::Font titleF, sf::Font optionsF, sf::Font arrowF, sf::Texture* texture) 
 	: titleFont(titleF), optionsFont(optionsF), arrowFont(arrowF) {
@@ -46,6 +46,10 @@ Title::Title(sf::Font titleF, sf::Font optionsF, sf::Font arrowF, sf::Texture* t
 	drawableSprite.push_back(&background);
 }
 
+void Title::setTitle(std::string t) {
+	title.setString(t);
+}
+
 int Title::handleEvent(sf::Event event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
@@ -67,5 +71,4 @@ int Title::handleEvent(sf::Event event) {
 		}
 	}
 	return -1;
-	
 }
