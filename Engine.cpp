@@ -265,7 +265,9 @@ void Engine::updateAnimations(sf::Time elapsed) {
 
 void Engine::combatStart() {
 	std::vector<Creature> enemies;
-	creatures.push_back(creatures[0]);
+	for (int i = 0; i < 6; i++) {
+		enemies.push_back(*creatures[0]);
+	}
 	combatEnvironment = new Combat(party, enemies, this, JMH_Arkham, Arrows, ArcadeClassic);
 	startAnimation(Animation(CombatStart, this));
 	

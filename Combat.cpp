@@ -15,10 +15,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureOneName.setFillColor(sf::Color::White);
 			creatureOneName.setOutlineColor(sf::Color::Black);
 			creatureOneName.setOutlineThickness(1);
+			creatureOneName.setPosition(sf::Vector2f(75, 410));
 
 			drawableText.push_back(&creatureOneName);
 			
 			creatureOneSprite = creatures[0].sprite;
+			creatureOneSprite.setPosition(sf::Vector2f(250, 40));
 
 			drawableSprite.push_back(&creatureOneSprite);
 			break;
@@ -29,10 +31,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureTwoName.setFillColor(sf::Color::White);
 			creatureTwoName.setOutlineColor(sf::Color::Black);
 			creatureTwoName.setOutlineThickness(1);
+			creatureTwoName.setPosition(sf::Vector2f(75, 438));
 
 			drawableText.push_back(&creatureTwoName);
 
 			creatureTwoSprite = creatures[1].sprite;
+			creatureTwoSprite.setPosition(sf::Vector2f(250, 150));
 
 			drawableSprite.push_back(&creatureTwoSprite);
 			break;
@@ -43,10 +47,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureThreeName.setFillColor(sf::Color::White);
 			creatureThreeName.setOutlineColor(sf::Color::Black);
 			creatureThreeName.setOutlineThickness(1);
+			creatureThreeName.setPosition(sf::Vector2f(75, 466));
 
 			drawableText.push_back(&creatureThreeName);
 
 			creatureThreeSprite = creatures[2].sprite;
+			creatureThreeSprite.setPosition(sf::Vector2f(250, 260));
 
 			drawableSprite.push_back(&creatureThreeSprite);
 			break;
@@ -57,10 +63,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureFourName.setFillColor(sf::Color::White);
 			creatureFourName.setOutlineColor(sf::Color::Black);
 			creatureFourName.setOutlineThickness(1);
+			creatureFourName.setPosition(sf::Vector2f(75, 494));
 
 			drawableText.push_back(&creatureFourName);
 
 			creatureFourSprite = creatures[3].sprite;
+			creatureFourSprite.setPosition(sf::Vector2f(100, 40));
 
 			drawableSprite.push_back(&creatureFourSprite);
 			break;
@@ -71,10 +79,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureFiveName.setFillColor(sf::Color::White);
 			creatureFiveName.setOutlineColor(sf::Color::Black);
 			creatureFiveName.setOutlineThickness(1);
+			creatureFiveName.setPosition(sf::Vector2f(75, 522));
 
 			drawableText.push_back(&creatureFiveName);
 
 			creatureFiveSprite = creatures[4].sprite;
+			creatureFiveSprite.setPosition(sf::Vector2f(100, 150));
 			
 			drawableSprite.push_back(&creatureFiveSprite);
 			break;
@@ -85,10 +95,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 			creatureSixName.setFillColor(sf::Color::White);
 			creatureSixName.setOutlineColor(sf::Color::Black);
 			creatureSixName.setOutlineThickness(1);
+			creatureSixName.setPosition(sf::Vector2f(75, 550));
 
 			drawableText.push_back(&creatureSixName);
 
 			creatureSixSprite = creatures[5].sprite;
+			creatureSixSprite.setPosition(sf::Vector2f(100, 260));
 
 			drawableSprite.push_back(&creatureSixSprite);
 			break;
@@ -98,11 +110,11 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	//Set player status text
 	std::string str = "";
 	str += party[0]->getName();
-	str += " HP ";
+	str += "  HP ";
 	str += std::to_string(party[0]->getCurrentHP());
 	str += "/";
 	str += std::to_string(party[0]->getMaxHP());
-	str += " MP ";
+	str += "    MP ";
 	str += std::to_string(party[0]->getCurrentMP());
 	str += "/";
 	str += std::to_string(party[0]->getMaxMP());
@@ -112,20 +124,22 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	partyOneStatus.setFillColor(sf::Color::White);
 	partyOneStatus.setOutlineColor(sf::Color::Black);
 	partyOneStatus.setOutlineThickness(1);
+	partyOneStatus.setPosition(sf::Vector2f(430, 410));
 
 	drawableText.push_back(&partyOneStatus);
 
 	partyOneSprite = *party[0]->getSprite();
+	partyOneSprite.setPosition(sf::Vector2f(600, 40));
 	
 	drawableSprite.push_back(&partyOneSprite);
 	str.clear();
 
 	str += party[1]->getName();
-	str += " HP ";
+	str += "  HP ";
 	str += std::to_string(party[1]->getCurrentHP());
 	str += "/";
 	str += std::to_string(party[1]->getMaxHP());
-	str += " MP ";
+	str += "    MP ";
 	str += std::to_string(party[1]->getCurrentMP());
 	str += "/";
 	str += std::to_string(party[1]->getMaxMP());
@@ -135,20 +149,22 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	partyTwoStatus.setFillColor(sf::Color::White);
 	partyTwoStatus.setOutlineColor(sf::Color::Black);
 	partyTwoStatus.setOutlineThickness(1);
+	partyTwoStatus.setPosition(sf::Vector2f(430, 438));
 
 	drawableText.push_back(&partyTwoStatus);
 
 	partyTwoSprite = *party[1]->getSprite();
+	partyTwoSprite.setPosition(sf::Vector2f(600, 130));
 	
 	drawableSprite.push_back(&partyTwoSprite);
 	str.clear();
 
 	str += party[2]->getName();
-	str += " HP ";
+	str += "   HP ";
 	str += std::to_string(party[2]->getCurrentHP());
 	str += "/";
 	str += std::to_string(party[2]->getMaxHP());
-	str += " MP ";
+	str += "    MP ";
 	str += std::to_string(party[2]->getCurrentMP());
 	str += "/";
 	str += std::to_string(party[2]->getMaxMP());
@@ -158,20 +174,22 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	partyThreeStatus.setFillColor(sf::Color::White);
 	partyThreeStatus.setOutlineColor(sf::Color::Black);
 	partyThreeStatus.setOutlineThickness(1);
+	partyThreeStatus.setPosition(sf::Vector2f(430, 466));
 	
 	drawableText.push_back(&partyThreeStatus);
 
 	partyThreeSprite = *party[2]->getSprite();
+	partyThreeSprite.setPosition(sf::Vector2f(600, 220));
 	
 	drawableSprite.push_back(&partyThreeSprite);
 	str.clear();
 
 	str += party[3]->getName();
-	str += " HP ";
+	str += "   HP ";
 	str += std::to_string(party[3]->getCurrentHP());
 	str += "/";
 	str += std::to_string(party[3]->getMaxHP());
-	str += " MP ";
+	str += "    MP ";
 	str += std::to_string(party[3]->getCurrentMP());
 	str += "/";
 	str += std::to_string(party[3]->getMaxMP());
@@ -181,10 +199,12 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	partyFourStatus.setFillColor(sf::Color::White);
 	partyFourStatus.setOutlineColor(sf::Color::Black);
 	partyFourStatus.setOutlineThickness(1);
+	partyFourStatus.setPosition(sf::Vector2f(430, 494));
 	
 	drawableText.push_back(&partyFourStatus);
 
 	partyFourSprite = *party[3]->getSprite();
+	partyFourSprite.setPosition(sf::Vector2f(600, 310));
 
 	drawableSprite.push_back(&partyFourSprite);
 	str.clear();
@@ -195,6 +215,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	optionAttack.setFillColor(sf::Color::White);
 	optionAttack.setOutlineColor(sf::Color::Black);
 	optionAttack.setOutlineThickness(1);
+	optionAttack.setPosition(sf::Vector2f(340, 410));
 
 	drawableText.push_back(&optionAttack);
 
@@ -204,6 +225,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	optionMagic.setFillColor(sf::Color::White);
 	optionMagic.setOutlineColor(sf::Color::Black);
 	optionMagic.setOutlineThickness(1);
+	optionMagic.setPosition(sf::Vector2f(340, 438));
 
 	drawableText.push_back(&optionMagic);
 
@@ -213,6 +235,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	optionItem.setFillColor(sf::Color::White);
 	optionItem.setOutlineColor(sf::Color::Black);
 	optionItem.setOutlineThickness(1);
+	optionItem.setPosition(sf::Vector2f(340, 466));
 
 	drawableText.push_back(&optionItem);
 
@@ -222,6 +245,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	optionFlee.setFillColor(sf::Color::White);
 	optionFlee.setOutlineColor(sf::Color::Black);
 	optionFlee.setOutlineThickness(1);
+	optionFlee.setPosition(sf::Vector2f(340, 494));
 
 	drawableText.push_back(&optionFlee);
 
@@ -240,7 +264,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 
 	drawableShape.push_back(&statusBackdrop);
 
-	optionsBackdrop.setSize(sf::Vector2f(125, 400));
+	optionsBackdrop.setSize(sf::Vector2f(125, 200));
 	optionsBackdrop.setPosition(sf::Vector2f(300, 400));
 	optionsBackdrop.setFillColor(sf::Color::Blue);
 	optionsBackdrop.setOutlineColor(sf::Color::White);
