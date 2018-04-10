@@ -30,3 +30,37 @@ PlayerCharacter::PlayerCharacter(std::string name, sf::Texture* texture, int id)
 	}
 	
 }
+
+void PlayerCharacter::setFleeing(bool b) {
+	flee = b;
+}
+
+void PlayerCharacter::setDead(bool b) {
+	dead = b;
+}
+
+void PlayerCharacter::decreaseHP(int n) {
+	if (currentHP - n < 0) currentHP = 0;
+	else currentHP -= n;
+}
+
+void PlayerCharacter::setXP(int n) {
+	if (n < maxXP) {
+		currentXP = n;
+	}
+	else {
+		level++;
+		unsigned remainingExperience = n - maxXP;
+		maxXP *= 1.2;
+		setXP(remainingExperience);
+		maxHP += 5;
+		currentHP += 5;
+		strength += 1;
+		dexterity += 1;
+		wisdom += 1;
+	}
+}
+
+void PlayerCharacter::setTarget(unsigned n) {
+	target = n;
+}

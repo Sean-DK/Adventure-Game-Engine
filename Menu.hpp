@@ -9,6 +9,7 @@ public:
 	Menu(sf::Font primaryFont, sf::Font arrowFont, std::vector<PlayerCharacter*> party);
 
 	GameState handleEvent(sf::Event event);
+	void update();
 	std::vector<sf::Text*> getDrawableText() { return drawableText; }
 	std::vector<sf::Sprite*> getDrawableSprite() { return drawableSprite; }
 	std::vector<sf::RectangleShape*> getDrawableShape() { return drawableShape; }

@@ -19,9 +19,11 @@ enum GameState {
 	_Overworld,
 	_CombatStart,
 	_Combat,
+	_BossCombat,
 	_CombatEnd,
 	_Menu,
 	_GameOver,
+	_Victory,
 	_Quit,
 };
 
@@ -31,11 +33,15 @@ public:
 	Engine(sf::RenderWindow* window);
 
 //Methods
+	void startup();
+
 	void handleEvent(sf::Event event);
 	void updateGame(sf::Time elapsed);
 	void changeState(GameState state);
 	void startAnimation(Animation animation);
 	void changeCurrentMap(unsigned id);
+	bool isAnimating() { return !animations.empty(); }
+	void checkFlags();
 
 private:
 //Heap storage for assets
@@ -44,7 +50,6 @@ private:
 	std::vector<Creature*> creatures;
 	//std::vector<Item*> items;
 	std::vector<Flag*> flags;
-	
 	Metadata* metadata;
 
 //Load assets
@@ -121,8 +126,6 @@ private:
 	sf::RectangleShape loadingBarFill;
 
 //Methods
-	void startup();
-
 	/*\brief Counts the total number of files to be loaded at startup
 	and sets Engine.totalFiles to this number*/
 	void countFiles();
@@ -130,6 +133,7 @@ private:
 	void draw();
 	void updateAnimations(sf::Time elapsed);
 	void combatStart();
+	void bossCombatStart(unsigned bossID);
 
 //Draw
 	void drawStartup();

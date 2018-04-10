@@ -265,12 +265,42 @@ void Engine::updateAnimations(sf::Time elapsed) {
 
 void Engine::combatStart() {
 	std::vector<Creature> enemies;
-	for (int i = 0; i < 6; i++) {
-		enemies.push_back(*creatures[0]);
+	//generate number of enemies
+	double numCreaturesChance = double(rand()) / RAND_MAX;
+	unsigned numCreatures;
+	if (numCreaturesChance <= 0.2) numCreatures = 1;
+	if (numCreaturesChance > 0.2 && numCreaturesChance <= 0.45) numCreatures = 2;
+	if (numCreaturesChance > 0.45 && numCreaturesChance <= 0.75) numCreatures = 3;
+	if (numCreaturesChance > 0.75 && numCreaturesChance <= 0.85) numCreatures = 4;
+	if (numCreaturesChance > 0.85 && numCreaturesChance <= 0.95) numCreatures = 5;
+	if (numCreaturesChance > 0.95) numCreatures = 6;
+	//generate type of enemies
+	for (unsigned i = 0; i < numCreatures; i++) {
+		int id = rand() % creatures.size();
+		if (creatures[id]->biome == currentMap->getCurrentTileBiome()
+			&& !creatures[id]->isBoss) {
+			enemies.push_back(*creatures[id]);
+		}
+		else {
+			while (creatures[id]->biome != currentMap->getCurrentTileBiome()
+				|| creatures[id]->isBoss) {
+				id = rand() % creatures.size();
+				if (creatures[id]->biome == currentMap->getCurrentTileBiome()
+					&& !creatures[id]->isBoss) {
+					enemies.push_back(*creatures[id]);
+				}
+			}
+		}
 	}
-	combatEnvironment = new Combat(party, enemies, this, JMH_Arkham, Arrows, ArcadeClassic);
+	combatEnvironment = new Combat(party, enemies, this, JMH_Arkham, Arrows, ArcadeClassic, textures);
 	startAnimation(Animation(CombatStart, this));
-	
+}
+
+void Engine::bossCombatStart(unsigned bossID) {
+	std::vector<Creature> boss;
+	boss.push_back(*creatures[bossID]);
+	combatEnvironment = new Combat(party, boss, this, JMH_Arkham, Arrows, ArcadeClassic, textures);
+	startAnimation(Animation(CombatStart, this));
 }
 
 void Engine::startAnimation(Animation animation) {
@@ -280,6 +310,16 @@ void Engine::startAnimation(Animation animation) {
 void Engine::changeCurrentMap(unsigned id) {
 	currentMap = maps[id];
 	currentMapID = id;
+}
+
+void Engine::checkFlags() {
+	bool complete = true;
+	for (unsigned i = 0; i < flags.size(); i++) {
+		if (!flags[i]->isComplete()) complete = false;
+	}
+	if (complete) {
+		startAnimation(Animation(VictoryFade, this));
+	}
 }
 
 void Engine::changeState(GameState state) {
@@ -325,10 +365,19 @@ void Engine::drawCombat() {
 	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
 	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
 	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
+	if (combatEnvironment->getPhase() == evaluateDamage) combatEnvironment->updateStatus();
 }
 
 void Engine::drawCombatEnd() {
-
+	std::vector<sf::RectangleShape*> shape;
+	shape = combatEnvironment->getDrawableShape();
+	std::vector<sf::Text*> text;
+	text = combatEnvironment->getDrawableText();
+	std::vector<sf::Sprite*> sprite;
+	sprite = combatEnvironment->getDrawableSprite();
+	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
+	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
 }
 
 void Engine::drawMenu() {
@@ -344,7 +393,17 @@ void Engine::drawMenu() {
 }
 
 void Engine::drawGameOver() {
-
+	/*
+	std::vector<sf::RectangleShape*> shape;
+	shape = combatEnvironment->getDrawableShape();
+	std::vector<sf::Text*> text;
+	text = combatEnvironment->getDrawableText();
+	std::vector<sf::Sprite*> sprite;
+	sprite = combatEnvironment->getDrawableSprite();
+	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
+	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
+	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
+	*/
 }
 
 void Engine::drawQuit() {
@@ -356,12 +415,23 @@ void Engine::drawAnimation() {
 	case TitleFadeNew:
 	case ChangeMap:
 	case CombatStart:
+	case CombatEnd:
 		window->draw(animations[0].getShape());
+		break;
+	case PlayerAttack:
+	case CreatureAttack:
+		window->draw(animations[0].getFloatingText());
+		break;
+	case GameOverFade:
+	case VictoryFade:
+		window->draw(animations[0].getShape());
+		window->draw(animations[0].getFloatingText());
+		break;
 	}
 }
 
 void Engine::startupHandler(sf::Event event) {
-	//ignore input on the startup screen
+	//ignore input
 }
 
 void Engine::titleHandler(sf::Event event) {
@@ -387,18 +457,27 @@ void Engine::overworldHandler(sf::Event event) {
 		changeState(_CombatStart);
 		combatStart();
 		break;
+	case _BossCombat: {
+		TileBoss tile = currentMap->getCurrentTileBoss();
+		if (tile.req->isComplete()) {
+			changeState(_CombatStart);
+			bossCombatStart(tile.creatureID);
+		}
+		break;
+	}
 	case _Menu:
+		menu->update();
 		changeState(_Menu);
 		break;
 	}
 }
 
-void Engine::combatStartHandler(sf::Event event)
-{
+void Engine::combatStartHandler(sf::Event event){
+	//ignore input
 }
 
-void Engine::combatHandler(sf::Event event)
-{
+void Engine::combatHandler(sf::Event event) {
+	combatEnvironment->handleEvent(event);
 }
 
 void Engine::combatEndHandler(sf::Event event)
@@ -420,7 +499,7 @@ void Engine::menuHandler(sf::Event event) {
 }
 
 void Engine::gameOverHandler(sf::Event event) {
-
+	if (event.type == sf::Event::KeyReleased) window->close();
 }
 
 Engine::Engine(sf::RenderWindow* window) 
@@ -456,6 +535,7 @@ void Engine::handleEvent(sf::Event event) {
 			menuHandler(event);
 			break;
 		case _GameOver:
+		case _Victory:
 			gameOverHandler(event);
 			break;
 		}
@@ -584,12 +664,13 @@ void Engine::loadCreatures() {
 			std::string creatureNumber = std::to_string(k);
 			creatures.push_back(new Creature(j.at(creatureNumber).at("Name").get<std::string>(),
 				j.at(creatureNumber).at("Level").get<unsigned>(),
-				j.at(creatureNumber).at("Hitpoints").get<unsigned>(),
+				j.at(creatureNumber).at("Hitpoints").get<int>(),
 				j.at(creatureNumber).at("Strength").get<unsigned>(),
 				j.at(creatureNumber).at("EXP").get<unsigned>(),
 				j.at(creatureNumber).at("Biome").get<std::string>(),
 				j.at(creatureNumber).at("hasFlag").get<bool>(),
-				flags[j.at(creatureNumber).at("Flag").get<int>()]));
+				flags[j.at(creatureNumber).at("Flag").get<int>()],
+				j.at(creatureNumber).at("isBoss").get<bool>()));
 		}
 		inFile.close();
 	}

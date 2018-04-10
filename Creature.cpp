@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "Creature.hpp"
 
-Creature::Creature(std::string n, unsigned l, unsigned h, 
-	unsigned s, unsigned e, std::string b, bool hF, Flag* f)
+Creature::Creature(std::string n, unsigned l, int h, 
+	unsigned s, unsigned e, std::string b, bool hF, Flag* f, bool iB)
 	: name(n), level(l), hitpoints(h), strength(s), exp(e), 
-	hasFlag(hF), flag(f) {
+	hasFlag(hF), flag(f), isBoss(iB) {
 	biome = s2b(b);
 
 	sf::Texture* texture = new sf::Texture();
@@ -13,13 +13,13 @@ Creature::Creature(std::string n, unsigned l, unsigned h,
 	if (name == "Goblin") {
 		sprite.setTextureRect(sf::IntRect(0, 64, 41, 64));
 	}
-	if (name == "Cave Goblin") {
+	else if (name == "Cave Goblin") {
 		sprite.setTextureRect(sf::IntRect(41, 64, 41, 64));
 	}
-	if (name == "Goblin Chief") {
+	else if (name == "Goblin Chief") {
 		sprite.setTextureRect(sf::IntRect(82, 64, 41, 64));
 	}
-	if (name == "Bat") {
+	else if (name == "Bat") {
 		sprite.setTextureRect(sf::IntRect(192, 32, 64, 64));
 	}
 	else {

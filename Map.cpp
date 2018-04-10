@@ -65,16 +65,16 @@ GameState Map::handleEvent(sf::Event event) {
 	if (event.type == sf::Event::KeyPressed) {
 		switch (event.key.code) {
 		case sf::Keyboard::Up:
-			if (moveUp()) return _CombatStart;
+			return moveUp();
 			break;
 		case sf::Keyboard::Down:
-			if (moveDown()) return _CombatStart;
+			return moveDown();
 			break;
 		case sf::Keyboard::Left:
-			if (moveLeft()) return _CombatStart;
+			return moveLeft();
 			break;
 		case sf::Keyboard::Right:
-			if (moveRight()) return _CombatStart;
+			return moveRight();
 			break;
 		case sf::Keyboard::Return:
 			return _Menu;
@@ -84,18 +84,26 @@ GameState Map::handleEvent(sf::Event event) {
 	return _Overworld;
 }
 
-bool Map::moveUp() {
+GameState Map::moveUp() {
 	unsigned newPosition = playerCurrentPosition - gridWidth;
 	if (newPosition < grid.size()) {
 		Tile newTile = grid[newPosition];
 		if (!newTile.isSolid()) {
 			if (!newTile.getTileLink().isLink) {
-				bool battleResult = randomBattle();
-				playerPreviousPosition = playerCurrentPosition;
-				playerCurrentPosition -= gridWidth;
-				engine->startAnimation(Animation(PlayerMoveUp, &playerSprite, engine));
-				if (battleResult) {
-					return true;
+				if (!newTile.getTileBoss().isBoss) {
+					bool battleResult = randomBattle();
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition -= gridWidth;
+					engine->startAnimation(Animation(PlayerMoveUp, &playerSprite, engine));
+					if (battleResult) {
+						return _CombatStart;
+					}
+				}
+				else {
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition -= gridWidth;
+					engine->startAnimation(Animation(PlayerMoveUp, &playerSprite, engine));
+					return _BossCombat;
 				}
 			}
 			else {
@@ -105,21 +113,29 @@ bool Map::moveUp() {
 			}
 		}
 	}
-	return false;
+	return _Overworld;
 }
 
-bool Map::moveDown() {
+GameState Map::moveDown() {
 	unsigned newPosition = playerCurrentPosition + gridWidth;
 	if (newPosition < grid.size()) {
 		Tile newTile = grid[newPosition];
 		if (!newTile.isSolid()) {
 			if (!newTile.getTileLink().isLink) {
-				bool battleResult = randomBattle();
-				playerPreviousPosition = playerCurrentPosition;
-				playerCurrentPosition += gridWidth;
-				engine->startAnimation(Animation(PlayerMoveDown, &playerSprite, engine));
-				if (battleResult) {
-					return true;
+				if (!newTile.getTileBoss().isBoss) {
+					bool battleResult = randomBattle();
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition += gridWidth;
+					engine->startAnimation(Animation(PlayerMoveDown, &playerSprite, engine));
+					if (battleResult) {
+						return _CombatStart;
+					}
+				}
+				else {
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition += gridWidth;
+					engine->startAnimation(Animation(PlayerMoveDown, &playerSprite, engine));
+					return _BossCombat;
 				}
 			}
 			else {
@@ -129,22 +145,30 @@ bool Map::moveDown() {
 			}
 		}
 	}
-	return false;
+	return _Overworld;
 }
 
-bool Map::moveLeft() {
+GameState Map::moveLeft() {
 	unsigned newPosition = playerCurrentPosition - 1;
 	if (newPosition < grid.size()) {
 		Tile newTile = grid[newPosition];
 		if (newPosition % gridWidth == gridWidth - 1) {}
 		else if (!newTile.isSolid()) {
 			if (!newTile.getTileLink().isLink) {
-				bool battleResult = randomBattle();
-				playerPreviousPosition = playerCurrentPosition;
-				playerCurrentPosition -= 1;
-				engine->startAnimation(Animation(PlayerMoveLeft, &playerSprite, engine));
-				if (battleResult) {
-					return true;
+				if (!newTile.getTileBoss().isBoss) {
+					bool battleResult = randomBattle();
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition -= 1;
+					engine->startAnimation(Animation(PlayerMoveLeft, &playerSprite, engine));
+					if (battleResult) {
+						return _CombatStart;
+					}
+				}
+				else {
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition -= 1;
+					engine->startAnimation(Animation(PlayerMoveLeft, &playerSprite, engine));
+					return _BossCombat;
 				}
 			}
 			else {
@@ -154,22 +178,30 @@ bool Map::moveLeft() {
 			}
 		}
 	}
-	return false;
+	return _Overworld;
 }
 
-bool Map::moveRight() {
+GameState Map::moveRight() {
 	unsigned newPosition = playerCurrentPosition + 1;
 	if (newPosition < grid.size()) {
 		Tile newTile = grid[newPosition];
 		if (newPosition % gridWidth == 0) {}
 		else if (!newTile.isSolid()) {
 			if (!newTile.getTileLink().isLink) {
-				bool battleResult = randomBattle();
-				playerPreviousPosition = playerCurrentPosition;
-				playerCurrentPosition += 1;
-				engine->startAnimation(Animation(PlayerMoveRight, &playerSprite, engine));
-				if (battleResult) {
-					return true;
+				if (!newTile.getTileBoss().isBoss) {
+					bool battleResult = randomBattle();
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition += 1;
+					engine->startAnimation(Animation(PlayerMoveRight, &playerSprite, engine));
+					if (battleResult) {
+						return _CombatStart;
+					}
+				}
+				else {
+					playerPreviousPosition = playerCurrentPosition;
+					playerCurrentPosition += 1;
+					engine->startAnimation(Animation(PlayerMoveRight, &playerSprite, engine));
+					return _BossCombat;
 				}
 			}
 			else {
@@ -179,7 +211,7 @@ bool Map::moveRight() {
 			}
 		}
 	}
-	return false;
+	return _Overworld;
 }
 
 bool Map::randomBattle() {

@@ -14,6 +14,9 @@ public:
 
 	GameState handleEvent(sf::Event event);
 
+	Biome getCurrentTileBiome() { return grid[playerCurrentPosition].getBiome(); }
+	TileBoss getCurrentTileBoss() { return grid[playerCurrentPosition].getTileBoss(); }
+
 private:
 	Engine* engine;
 
@@ -28,10 +31,10 @@ private:
 
 	std::vector<sf::Sprite*> drawableSprite;
 
-	bool moveUp();
-	bool moveDown();
-	bool moveLeft();
-	bool moveRight();
+	GameState moveUp();
+	GameState moveDown();
+	GameState moveLeft();
+	GameState moveRight();
 
 	bool randomBattle();
 };

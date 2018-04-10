@@ -123,7 +123,7 @@ Menu::Menu(sf::Font primaryFont, sf::Font arrowF, std::vector<PlayerCharacter*> 
 		drawableText[i]->setOutlineColor(sf::Color::Black);
 		drawableText[i]->setOutlineThickness(1);
 		//Disable inventory/equipment
-		if (i == 1 || i == 2) {
+		if (i == 1 || i == 2 || i == 3) {
 			drawableText[i]->setFillColor(sf::Color(100, 100, 100, 255));
 		}
 	}
@@ -191,4 +191,66 @@ GameState Menu::handleEvent(sf::Event event) {
 		}
 	}
 	return _Menu;
+}
+
+void Menu::update() {
+	partyOneNameAndLevel.setString(party[0]->getName() + " Lv. " + std::to_string(party[0]->getLevel()));
+	partyOneNameAndLevel.setPosition(sf::Vector2f(300, 50));
+	partyOneHP.setString("HP: " + std::to_string(party[0]->getCurrentHP()) + "/" + std::to_string(party[0]->getMaxHP()));
+	partyOneHP.setPosition(sf::Vector2f(300, 70));
+	partyOneMP.setString("MP: " + std::to_string(party[0]->getCurrentMP()) + "/" + std::to_string(party[0]->getMaxMP()));
+	partyOneMP.setPosition(sf::Vector2f(300, 90));
+	partyOneXP.setString("XP: " + std::to_string(party[0]->getCurrentXP()) + "/" + std::to_string(party[0]->getMaxXP()));
+	partyOneXP.setPosition(sf::Vector2f(300, 110));
+	partyOneStr.setString("STR: " + std::to_string(party[0]->getStrength()));
+	partyOneStr.setPosition(sf::Vector2f(450, 70));
+	partyOneDex.setString("DEX: " + std::to_string(party[0]->getDexterity()));
+	partyOneDex.setPosition(sf::Vector2f(450, 90));
+	partyOneWis.setString("WIS: " + std::to_string(party[0]->getWisdom()));
+	partyOneWis.setPosition(sf::Vector2f(450, 110));
+
+	partyTwoNameAndLevel.setString(party[1]->getName() + " Lv. " + std::to_string(party[1]->getLevel()));
+	partyTwoNameAndLevel.setPosition(sf::Vector2f(300, 180));
+	partyTwoHP.setString("HP: " + std::to_string(party[1]->getCurrentHP()) + "/" + std::to_string(party[1]->getMaxHP()));
+	partyTwoHP.setPosition(sf::Vector2f(300, 200));
+	partyTwoMP.setString("MP: " + std::to_string(party[1]->getCurrentMP()) + "/" + std::to_string(party[1]->getMaxMP()));
+	partyTwoMP.setPosition(sf::Vector2f(300, 220));
+	partyTwoXP.setString("XP: " + std::to_string(party[1]->getCurrentXP()) + "/" + std::to_string(party[1]->getMaxXP()));
+	partyTwoXP.setPosition(sf::Vector2f(300, 240));
+	partyTwoStr.setString("STR: " + std::to_string(party[1]->getStrength()));
+	partyTwoStr.setPosition(sf::Vector2f(450, 200));
+	partyTwoDex.setString("DEX: " + std::to_string(party[1]->getDexterity()));
+	partyTwoDex.setPosition(sf::Vector2f(450, 220));
+	partyTwoWis.setString("WIS: " + std::to_string(party[1]->getWisdom()));
+	partyTwoWis.setPosition(sf::Vector2f(450, 240));
+
+	partyThreeNameAndLevel.setString(party[2]->getName() + " Lv. " + std::to_string(party[2]->getLevel()));
+	partyThreeNameAndLevel.setPosition(sf::Vector2f(300, 310));
+	partyThreeHP.setString("HP: " + std::to_string(party[2]->getCurrentHP()) + "/" + std::to_string(party[2]->getMaxHP()));
+	partyThreeHP.setPosition(sf::Vector2f(300, 330));
+	partyThreeMP.setString("MP: " + std::to_string(party[2]->getCurrentMP()) + "/" + std::to_string(party[2]->getMaxMP()));
+	partyThreeMP.setPosition(sf::Vector2f(300, 350));
+	partyThreeXP.setString("XP: " + std::to_string(party[2]->getCurrentXP()) + "/" + std::to_string(party[2]->getMaxXP()));
+	partyThreeXP.setPosition(sf::Vector2f(300, 370));
+	partyThreeStr.setString("STR: " + std::to_string(party[2]->getStrength()));
+	partyThreeStr.setPosition(sf::Vector2f(450, 330));
+	partyThreeDex.setString("DEX: " + std::to_string(party[2]->getDexterity()));
+	partyThreeDex.setPosition(sf::Vector2f(450, 350));
+	partyThreeWis.setString("WIS: " + std::to_string(party[2]->getWisdom()));
+	partyThreeWis.setPosition(sf::Vector2f(450, 370));
+
+	partyFourNameAndLevel.setString(party[3]->getName() + " Lv. " + std::to_string(party[3]->getLevel()));
+	partyFourNameAndLevel.setPosition(sf::Vector2f(300, 440));
+	partyFourHP.setString("HP: " + std::to_string(party[3]->getCurrentHP()) + "/" + std::to_string(party[3]->getMaxHP()));
+	partyFourHP.setPosition(sf::Vector2f(300, 460));
+	partyFourMP.setString("MP: " + std::to_string(party[3]->getCurrentMP()) + "/" + std::to_string(party[3]->getMaxMP()));
+	partyFourMP.setPosition(sf::Vector2f(300, 480));
+	partyFourXP.setString("XP: " + std::to_string(party[3]->getCurrentXP()) + "/" + std::to_string(party[3]->getMaxXP()));
+	partyFourXP.setPosition(sf::Vector2f(300, 500));
+	partyFourStr.setString("STR: " + std::to_string(party[3]->getStrength()));
+	partyFourStr.setPosition(sf::Vector2f(450, 460));
+	partyFourDex.setString("DEX: " + std::to_string(party[3]->getDexterity()));
+	partyFourDex.setPosition(sf::Vector2f(450, 480));
+	partyFourWis.setString("WIS: " + std::to_string(party[3]->getWisdom()));
+	partyFourWis.setPosition(sf::Vector2f(450, 500));
 }

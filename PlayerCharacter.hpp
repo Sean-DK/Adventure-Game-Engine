@@ -16,18 +16,27 @@ public:
 	unsigned getMaxMP() { return maxMP; }
 	unsigned getMaxXP() { return maxXP; }
 
-	unsigned getCurrentHP() { return currentHP; }
-	unsigned getCurrentMP() { return currentMP; }
-	unsigned getCurrentXP() { return currentXP; }
+	int getCurrentHP() { return currentHP; }
+	int getCurrentMP() { return currentMP; }
+	int getCurrentXP() { return currentXP; }
 
 	unsigned getStrength() { return strength; }
 	unsigned getDexterity() { return dexterity; }
 	unsigned getWisdom() { return wisdom; }
 
+	unsigned getTarget() { return target; }
 	bool isFleeing() { return flee; }
 	bool isDead() { return dead; }
 
 	sf::Sprite* getSprite() { return &sprite; }
+
+//Mutators
+	void setTarget(unsigned n);
+	void setFleeing(bool b);
+	void setDead(bool b);
+
+	void decreaseHP(int n);
+	void setXP(int n);
 
 private:
 //Stats
@@ -39,16 +48,16 @@ private:
 	unsigned maxMP;
 	unsigned maxXP;
 
-	unsigned currentHP;
-	unsigned currentMP;
-	unsigned currentXP;
+	int currentHP;
+	int currentMP;
+	int currentXP;
 
 	unsigned strength;
 	unsigned dexterity;
 	unsigned wisdom;
 
 //Combat stuff
-	//Creature* target;
+	unsigned target;
 	bool flee = false;
 	bool dead = false;
 
