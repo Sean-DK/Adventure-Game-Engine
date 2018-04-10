@@ -17,6 +17,8 @@ public:
 	Biome getCurrentTileBiome() { return grid[playerCurrentPosition].getBiome(); }
 	TileBoss getCurrentTileBoss() { return grid[playerCurrentPosition].getTileBoss(); }
 
+	sf::Vector2f getPlayerCurrentPosition() { return playerSprite.getPosition(); }
+
 private:
 	Engine* engine;
 

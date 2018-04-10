@@ -147,7 +147,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	drawableText.push_back(&partyOneStatus);
 
 	partyOneSprite = *party[0]->getSprite();
-	partyOneSprite.setPosition(sf::Vector2f(600, 150));
+	partyOneSprite.setPosition(sf::Vector2f(560, 150));
 	
 	drawableSprite.push_back(&partyOneSprite);
 	str.clear();
@@ -172,7 +172,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	drawableText.push_back(&partyTwoStatus);
 
 	partyTwoSprite = *party[1]->getSprite();
-	partyTwoSprite.setPosition(sf::Vector2f(600, 200));
+	partyTwoSprite.setPosition(sf::Vector2f(580, 200));
 	
 	drawableSprite.push_back(&partyTwoSprite);
 	str.clear();
@@ -222,7 +222,7 @@ Combat::Combat(std::vector<PlayerCharacter*> p, std::vector<Creature> c, Engine*
 	drawableText.push_back(&partyFourStatus);
 
 	partyFourSprite = *party[3]->getSprite();
-	partyFourSprite.setPosition(sf::Vector2f(600, 300));
+	partyFourSprite.setPosition(sf::Vector2f(620, 300));
 
 	drawableSprite.push_back(&partyFourSprite);
 	str.clear();
@@ -607,7 +607,10 @@ void Combat::updateStatus() {
 		for (unsigned i = 0; i < party.size(); i++) {
 			if (!party[i]->isFleeing()) flee = false;
 		}
-		if (flee) engine->changeState(_Overworld);
+		if (flee) {
+			engine->startAnimation(Animation(CombatEnd, engine));
+			engine->changeState(_CombatEnd);
+		}
 		//Determine control flow
 		switch (phase) {
 		case victory: {

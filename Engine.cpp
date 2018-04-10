@@ -226,30 +226,39 @@ void Engine::draw() {
 	window->clear();
 	switch (currentState) {
 	case _Startup:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawStartup();
 		break;
 	case _Title:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawTitle();
 		break;
 	case _Overworld:
+		window->setView(sf::View(currentMap->getPlayerCurrentPosition(), sf::Vector2f(800, 600)));
 		drawOverworld();
 		break;
 	case _CombatStart:
+		window->setView(sf::View(currentMap->getPlayerCurrentPosition(), sf::Vector2f(800, 600)));
 		drawCombatStart();
 		break;
 	case _Combat:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawCombat();
 		break;
 	case _CombatEnd:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawCombatEnd();
 		break;
 	case _Menu:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawMenu();
 		break;
 	case _GameOver:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawGameOver();
 		break;
 	case _Quit:
+		window->setView(sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600)));
 		drawQuit();
 		break;
 	}
@@ -393,7 +402,6 @@ void Engine::drawMenu() {
 }
 
 void Engine::drawGameOver() {
-	/*
 	std::vector<sf::RectangleShape*> shape;
 	shape = combatEnvironment->getDrawableShape();
 	std::vector<sf::Text*> text;
@@ -403,7 +411,6 @@ void Engine::drawGameOver() {
 	for (unsigned i = 0; i < shape.size(); window->draw(*shape[i++]));
 	for (unsigned i = 0; i < sprite.size(); window->draw(*sprite[i++]));
 	for (unsigned i = 0; i < text.size(); window->draw(*text[i++]));
-	*/
 }
 
 void Engine::drawQuit() {
@@ -480,8 +487,8 @@ void Engine::combatHandler(sf::Event event) {
 	combatEnvironment->handleEvent(event);
 }
 
-void Engine::combatEndHandler(sf::Event event)
-{
+void Engine::combatEndHandler(sf::Event event) {
+	//ignore input
 }
 
 void Engine::menuHandler(sf::Event event) {
